@@ -1,0 +1,7 @@
+.logo {
+  max-width: 250px; /* Adjust this value as needed */
+  height: auto;
+  display: block; /* Ensures the image is treated as a block element */
+  margin-left: auto;
+  margin-right: auto;
+}
