@@ -2,6 +2,8 @@ var express = require('express');
 var router = express.Router();
 const sequelize = require('../persistance/database');
 const User = require('../persistance/model/user')(sequelize, require('sequelize').DataTypes);
+const { generateToken } = require('../utils/jwt');
+const { authenticateToken } = require('../middleware/auth');
 
 /* User login */
 router.post('/login', function(req, res, next) {
@@ -16,7 +18,10 @@ router.post('/login', function(req, res, next) {
         .then((isValid) => {
           if (isValid) {
             //req.session.userId = user.id;
-            return res.redirect('/dashboard');
+            const token = generateToken(user);
+            // Set the token as a cookie
+            res.cookie('token', token, { httpOnly: true, secure: true });
+            return res.redirect('/applications/dashboard');
           } else {
             return res.render('index', { error: 'Contraseña no válida' });
           }
@@ -35,6 +40,11 @@ router.post('/login', function(req, res, next) {
     console.error('Error logging in user:', error);
     return res.render('index', { error: 'Ocurrió un error' });
   }
+});
+
+router.get('/logout', (req, res) => {
+  res.clearCookie('token');
+  res.redirect('/');
 });
 
 router.post('/register', async (req, res) => {
