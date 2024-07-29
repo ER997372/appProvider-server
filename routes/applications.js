@@ -2,8 +2,8 @@ var express = require('express');
 var router = express.Router();
 const { authenticateToken } = require('../middleware/auth');
 const sequelize = require('../persistance/database');
-const Application = require('../persistance/model/application')(sequelize, require('sequelize').DataTypes);
-const User = require('../persistance/model/user')(sequelize, require('sequelize').DataTypes);
+const Application = require('../persistance/model/application');
+const User = require('../persistance/model/user');
 const multer = require('multer');
 const path = require('path');
 
