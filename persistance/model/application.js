@@ -1,51 +1,36 @@
-'use strict';
-const { Model } = require('sequelize');
+const { DataTypes } = require('sequelize');
+const sequelize = require('../database');
+const User = require('./user');
 
-module.exports = (sequelize, DataTypes) => {
-
-  class Application extends Model {
-    static associate(models) {
-      // define association here
-    }
-  }
-
-  Application.init({
+const Application = sequelize.define('Application', {
     name: {
-      type: DataTypes.STRING,
-      allowNull: false
+        type: DataTypes.STRING,
+        allowNull: false,
     },
     packageName: {
-      type: DataTypes.STRING,
-      allowNull: false
+        type: DataTypes.STRING,
+        allowNull: false,
     },
     version: {
-      type: DataTypes.STRING,
-      allowNull: false
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
+    filePath: {
+        type: DataTypes.TEXT,
+        allowNull: false
     },
     userId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: 'Users',
-        key: 'id'
-      }
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: {
+            model: User,
+            key: 'id',
+        },
     },
-    uploadedBy: {
-      type: DataTypes.STRING,
-      allowNull: false
-    }
-  }, {
-    sequelize,
-    modelName: "Application",
-    timestamps: true
-  });
+});
 
-  Application.associate = models => {
-    Application.belongsTo(models.User, {
-      foreignKey: 'userId',
-      as: 'user'
-    });
-  };
+// Define associations
+Application.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+User.hasMany(Application, { foreignKey: 'userId', as: 'applications' });
 
-  return Application;
-};
+module.exports = Application;

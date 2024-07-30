@@ -15,18 +15,25 @@ block content
                 a.nav-link(href='/users/logout') Logout
     .row.mt-4
       .col-md-12
-        h2.text-center New App
-        form(action='/applications/create', method='POST', enctype='multipart/form-data')
-          .form-group
+        h2.text-center= application.name
+        form(action='/applications/update', method='POST', enctype='multipart/form-data')
+            .form-group
+            input#version.form-control(type='hidden', name='id', required=true value= application.id)
+            .form-group
             label(for='appName') App Name
-            input#appName.form-control(type='text', name='name', required=true)
-          .form-group
+            label.form-control(disabled)= application.name
+            .form-group
             label(for='packageName') Package Name
-            input#packageName.form-control(type='text', name='packageName', required=true)
-          .form-group
+            label.form-control(disabled)= application.packageName
+            .form-group
             label(for='version') Version
-            input#version.form-control(type='text', name='version', required=true)
+            input#version.form-control(type='text', name='version', required=true value= application.version)
             .form-group
             label(for='file') APK File
             input#file.form-control-file.form-control(type='file', name='file', required=true)
-            button.btn.btn-primary(type='submit') Crear
+            button.btn.btn-primary(type='submit') Update
+
+        form(action='/applications/delete', method='POST')
+            .form-group
+            input#delVersion.form-control(type='hidden', name='id', required=true value= application.id)
+            button.btn.btn-danger(type='submit') Delete App

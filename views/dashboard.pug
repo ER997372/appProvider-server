@@ -33,5 +33,7 @@ block content
                 td= application.name
                 td= application.packageName
                 td= application.version
-                td= application.uploadedBy
+                td= application.user.username
                 td= new Date(application.createdAt).toLocaleString()
+                td
+                  a.btn.btn-primary(href='/applications/update?id=' + application.id) Update

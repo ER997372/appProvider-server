@@ -1,9 +1,10 @@
 var express = require('express');
 var router = express.Router();
 const sequelize = require('../persistance/database');
-const User = require('../persistance/model/user')(sequelize, require('sequelize').DataTypes);
+const User = require('../persistance/model/user');
 const { generateToken } = require('../utils/jwt');
 const { authenticateToken } = require('../middleware/auth');
+const bcrypt = require("bcrypt");
 
 /* User login */
 router.post('/login', function(req, res, next) {
@@ -14,7 +15,7 @@ router.post('/login', function(req, res, next) {
       if (!user) {
         return res.render('index', { error: 'Usuario inexistente' });
       } else {
-        user.validPassword(password)
+        bcrypt.compare(password, user.password)
         .then((isValid) => {
           if (isValid) {
             //req.session.userId = user.id;
