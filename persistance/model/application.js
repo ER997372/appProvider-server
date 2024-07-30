@@ -15,8 +15,9 @@ const Application = sequelize.define('Application', {
         type: DataTypes.STRING,
         allowNull: false,
     },
-    description: {
+    filePath: {
         type: DataTypes.TEXT,
+        allowNull: false
     },
     userId: {
         type: DataTypes.INTEGER,

@@ -6,6 +6,7 @@ const Application = require('../persistance/model/application');
 const User = require('../persistance/model/user');
 const multer = require('multer');
 const path = require('path');
+const fs = require('fs');
 
 // Configure multer for file uploads
 const storage = multer.diskStorage({
@@ -32,7 +33,6 @@ router.get('/dashboard', authenticateToken, async (req, res, next) => {
 
   try {
     const applications = await Application.findAll({
-      where: { userId: req.user.id },
       include: [{ model: User, as: 'user' }]
     });
     res.render('dashboard', { title: "TestFly Dashboard", applications });
@@ -57,7 +57,6 @@ router.post('/create', authenticateToken, upload.single('file'), async (req, res
       packageName,
       version,
       userId: req.user.id,
-      uploadedBy: req.user.username,
       filePath: req.file.path // Save file path
     });
 
@@ -66,6 +65,42 @@ router.post('/create', authenticateToken, upload.single('file'), async (req, res
     console.error('Error uploading app:', error);
     res.status(500).send('Error uploading app');
   }
+});
+
+router.get('/update', authenticateToken, async function(req, res, next) {
+  Application.findOne({
+    where: { userId: req.query.id },
+    include: [{ model: User, as: 'user' }]
+  }).then((application) => {
+    res.render("update", { title: "Update App", application})
+  }).catch((error) => {
+    console.log(error);
+  res.redirect("/dashboard")
+  });
+});
+
+router.post('/update', authenticateToken, upload.single('file'), async (req, res) => {
+  const { id, version } = req.body;
+
+  Application.findByPk(id).then((currentApplication) => {
+    const oldFilePath = path.join(currentApplication.filePath);
+    fs.unlink(oldFilePath, (err) => {
+      if (err) {
+        console.error('Error deleting old file:', err);
+      }
+    });
+
+    currentApplication.version = version
+    currentApplication.filePath = req.file.path
+
+    currentApplication.save();
+
+  
+    res.redirect('/applications/dashboard');
+  }).catch((error) => {
+    console.error('Error uploading app:', error);
+  res.status(500).send('Error uploading app');
+  });
 });
 
 module.exports = router;
