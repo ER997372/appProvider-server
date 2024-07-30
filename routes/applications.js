@@ -15,7 +15,19 @@ const storage = multer.diskStorage({
   }
 });
 
-const upload = multer({ storage });
+const fileFilter = (req, file, cb) => {
+  const fileExtension = path.extname(file.originalname).toLowerCase();
+  const allowedExtensions = ['.apk'];
+  
+  if (file.mimetype === 'application/vnd.android.package-archive' || 
+      (file.mimetype === 'application/octet-stream' && allowedExtensions.includes(fileExtension))) {
+    cb(null, true);
+  } else {
+    cb(new Error('Only APK files are allowed!'), false);
+  }
+};
+
+const upload = multer({ storage, fileFilter });
 
 /* GET home page. */
 router.get('/', authenticateToken, ApplicationController.renderHome);

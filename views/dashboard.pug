@@ -23,17 +23,19 @@ block content
           thead
             tr
               th Name
-              th Package Name
+              th Package
               th Version
+              th Version Code
               th Uploaded By
-              th Uploaded At
+              th Updated At
           tbody
             each application in applications
               tr
                 td= application.name
                 td= application.packageName
                 td= application.version
+                td= application.versionCode
                 td= application.user.username
-                td= new Date(application.createdAt).toLocaleString()
+                td= new Date(application.updatedAt).toLocaleString()
                 td
                   a.btn.btn-primary(href='/applications/update?id=' + application.id) Update

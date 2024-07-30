@@ -2,6 +2,7 @@ const Application = require('../persistance/model/application');
 const User = require('../persistance/model/user');
 const path = require('path');
 const fs = require('fs');
+const ApkReader = require('../utils/apkReader');
 
 
 function renderHome(req, res, next) {
@@ -29,7 +30,7 @@ function renderCreateApplication(req, res, next) {
 
 function renderUpdateApplication(req, res, next) {
     Application.findOne({
-      where: { userId: req.query.id },
+      where: { id: req.query.id },
       include: [{ model: User, as: 'user' }]
     }).then((application) => {
       res.render("update", { title: "Update App", application})
@@ -40,44 +41,69 @@ function renderUpdateApplication(req, res, next) {
 }
 
 function createApplication(req, res) {
-    const { name, packageName, version } = req.body;
+    const { name } = req.body;
 
-    Application.create({
-        name,
-        packageName,
-        version,
-        userId: req.user.id,
-        filePath: req.file.path // Save file path
-      }).then((application) => {
-        res.redirect('/applications/dashboard');
-      }).catch((error) => {
-        console.error('Error uploading app:', error);
-        res.status(500).send('Error uploading app');
-      });
+    ApkReader.readApk(req.file.path)
+        .then((result) => {
+          const packageName = result.packageName;
+          const versionCode = result.versionCode;
+          const versionName = result.versionName;
+          Application.create({
+            name,
+            packageName,
+            version: versionName,
+            versionCode,
+            userId: req.user.id,
+            filePath: req.file.path // Save file path
+          }).then((application) => {
+            res.redirect('/applications/dashboard');
+          }).catch((error) => {
+            console.error('Error uploading app:', error);
+            res.status(500).send('Error uploading app');
+          });
+        }).catch((error) => {
+          console.error('Error uploading app:', error);
+            res.status(500).send('Error uploading app');
+        });
 }
 
 function updateApplication(req, res) {
-    const { id, version } = req.body;
+    const { id } = req.body;
   
     // buscar el registro
     Application.findByPk(id).then((currentApplication) => {
-      // Eliminar el archivo viejo
-      const oldFilePath = path.join(currentApplication.filePath);
-      fs.unlink(oldFilePath, (err) => {
-        if (err) {
-          console.error('Error deleting old file:', err);
-        }
-      });
-  
-      // Actualizar los campos en el objeto consultado
-      currentApplication.version = version
-      currentApplication.filePath = req.file.path
-  
-      // Actualizar el registro en BD
-      currentApplication.save();
-  
-      // Redirigir al dashboard
-      res.redirect('/applications/dashboard');
+
+      if(currentApplication) {
+        ApkReader.readApk(req.file.path).then(result => {
+
+          const packageName = result.packageName;
+          const versionCode = result.versionCode;
+          const versionName = result.versionName;
+
+          // Eliminar el archivo viejo
+          const oldFilePath = path.join(currentApplication.filePath);
+          fs.unlink(oldFilePath, (err) => {
+            if (err) {
+              console.error('Error deleting old file:', err);
+            }
+          });
+      
+          // Actualizar los campos en el objeto consultado
+          currentApplication.version = versionName
+          currentApplication.versionCode = versionCode
+          currentApplication.packageName = packageName
+          currentApplication.filePath = req.file.path
+      
+          // Actualizar el registro en BD
+          currentApplication.save();
+      
+          // Redirigir al dashboard
+          res.redirect('/applications/dashboard');
+        })
+      } else {
+        console.error('app not found');
+        res.status(500).send('app not found');
+      }
     }).catch((error) => {
       console.error('Error uploading app:', error);
     res.status(500).send('Error uploading app');
