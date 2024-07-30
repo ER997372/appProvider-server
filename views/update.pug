@@ -32,3 +32,8 @@ block content
             label(for='file') APK File
             input#file.form-control-file.form-control(type='file', name='file', required=true)
             button.btn.btn-primary(type='submit') Update
+
+        form(action='/applications/delete', method='POST')
+            .form-group
+            input#delVersion.form-control(type='hidden', name='id', required=true value= application.id)
+            button.btn.btn-danger(type='submit') Delete App

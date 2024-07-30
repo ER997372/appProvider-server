@@ -82,7 +82,9 @@ router.get('/update', authenticateToken, async function(req, res, next) {
 router.post('/update', authenticateToken, upload.single('file'), async (req, res) => {
   const { id, version } = req.body;
 
+  // buscar el registro
   Application.findByPk(id).then((currentApplication) => {
+    // Eliminar el archivo viejo
     const oldFilePath = path.join(currentApplication.filePath);
     fs.unlink(oldFilePath, (err) => {
       if (err) {
@@ -90,16 +92,44 @@ router.post('/update', authenticateToken, upload.single('file'), async (req, res
       }
     });
 
+    // Actualizar los campos en el objeto consultado
     currentApplication.version = version
     currentApplication.filePath = req.file.path
 
+    // Actualizar el registro en BD
     currentApplication.save();
 
-  
+    // Redirigir al dashboard
     res.redirect('/applications/dashboard');
   }).catch((error) => {
     console.error('Error uploading app:', error);
   res.status(500).send('Error uploading app');
+  });
+});
+
+
+router.post('/delete', authenticateToken, async (req, res) => {
+  const { id } = req.body;
+
+  // Borrar el archivo
+  Application.findByPk(id).then((result) => {
+    const filepath = path.join(result.filePath);
+    fs.unlink(filepath, (err) => {
+      if (err) {
+        console.error('Error deleting file:', err);
+      }
+    });
+
+    // Borrar el registro
+    result.destroy().then(() => {
+      res.redirect('/applications/dashboard');
+    }).catch((error) => {
+      console.error('Error deleting app:', error);
+      res.status(500).send('Error deleting app');
+    });
+  }).catch((error) => {
+    console.error('Error deleting app:', error);
+  res.status(500).send('Error deleting app');
   });
 });
 
