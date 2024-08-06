@@ -9,6 +9,7 @@ const session = require('express-session');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var applicationsRouter = require('./routes/applications');
+var apiRouter = require('./routes/api');
 
 var app = express();
 
@@ -31,9 +32,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/applications', applicationsRouter);
+app.use('/api', apiRouter);
 
 // Sync model with database
-sequelize.sync({ force: true }) // Use { force: true } only for development!
+sequelize.sync({ force: false }) // Use { force: true } only for development!
     .then(() => {
         console.log('Database synced');
         })

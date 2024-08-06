@@ -10,9 +10,14 @@ const Application = sequelize.define('Application', {
     packageName: {
         type: DataTypes.STRING,
         allowNull: false,
+        unique: true
     },
     version: {
         type: DataTypes.STRING,
+        allowNull: false,
+    },
+    versionCode: {
+        type: DataTypes.INTEGER,
         allowNull: false,
     },
     filePath: {
