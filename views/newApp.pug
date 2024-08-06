@@ -1,0 +1,26 @@
+extends layout
+
+block content
+  .container
+    .row
+      .col-md-12
+        nav.navbar.navbar-expand-lg.navbar-light.bg-light
+          a.navbar-brand(href='/applications/dashboard') Dashboard
+          button.navbar-toggler(type='button', data-toggle='collapse', data-target='#navbarNav', aria-controls='navbarNav', aria-expanded='false', aria-label='Toggle navigation')
+            span.navbar-toggler-icon
+          .collapse.navbar-collapse#navbarNav
+            ul.navbar-nav.mr-auto
+            ul.navbar-nav.ml-auto
+              li.nav-item
+                a.nav-link(href='/users/logout') Logout
+    .row.mt-4
+      .col-md-12
+        h2.text-center New App
+        form(action='/applications/create', method='POST', enctype='multipart/form-data')
+          .form-group
+            label(for='appName') App Name
+            input#appName.form-control(type='text', name='name', required=true)
+            .form-group
+            label(for='file') APK File
+            input#file.form-control-file.form-control(type='file', name='file', accept='.apk', required=true)
+            button.btn.btn-primary(type='submit') Crear

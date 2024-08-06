@@ -1,0 +1,32 @@
+name: Deploy to Server
+
+on:
+  push:
+    branches:
+      - main  # Set this to your default branch if it's not master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Zip the code
+        run: |
+          zip -r deploy.zip . -x "*node_modules*/*"
+          
+      - name: Set up SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.DEPLOY_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          echo "StrictHostKeyChecking=no" >> ~/.ssh/config
+        env:
+          DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
+
+      - name: Transfer zip file to server
+        run: scp deploy.zip softsysd@softsys.space:${{ env.WORKING_DIRECTORY }}/
+
+      - name: Deploy on server
+        run: ssh softsysd@softsys.space 'unzip -o ${{ env.WORKING_DIRECTORY }}/deploy.zip -d ${{ env.WORKING_DIRECTORY }} && rm ${{ env.WORKING_DIRECTORY }}/deploy.zip'
