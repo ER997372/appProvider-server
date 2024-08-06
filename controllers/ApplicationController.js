@@ -137,6 +137,7 @@ function deleteApplication(req, res) {
 
 
 async function getAllApplications(req, res, next) {
+  if(req.headers.authorization === "Bearer wV6t>nQxo7p2gQ(?pRe<[l5HSW*/[pQa") {
     Application.findAll().then((apps) => {
       if(apps) {
         res.json({ code: 0, mensaje: "OK", apps});
@@ -144,9 +145,14 @@ async function getAllApplications(req, res, next) {
         res.json({ code: -1, mensaje: "sin aplicaciones"})
       }
     });
+  } else {
+    console.log("Error de autorizacion");
+    res.status(403).json({ code: -1, mensaje: "No autorizado"})
+  }
 }
 
 async function downloadApplication(req, res, next) {
+  if(req.headers.authorization === "Bearer wV6t>nQxo7p2gQ(?pRe<[l5HSW*/[pQa") {
     const appId = req.params.appId;
     Application.findByPk(appId).then((app) => {
       if(app) {
@@ -163,6 +169,10 @@ async function downloadApplication(req, res, next) {
       console.log(error);
       res.status(500).json({ code: -1, mensaje: "sin aplicaciones"})
     });
+  } else {
+    console.log("Error de autorizacion");
+    res.status(403).json({ code: -1, mensaje: "No autorizado"})
+  }
 }
 
 

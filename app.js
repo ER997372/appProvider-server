@@ -35,7 +35,7 @@ app.use('/applications', applicationsRouter);
 app.use('/api', apiRouter);
 
 // Sync model with database
-sequelize.sync({ force: true }) // Use { force: true } only for development!
+sequelize.sync({ force: false }) // Use { force: true } only for development!
     .then(() => {
         console.log('Database synced');
         })
