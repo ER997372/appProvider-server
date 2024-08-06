@@ -26,7 +26,7 @@ jobs:
           DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
 
       - name: Transfer zip file to server
-        run: scp deploy.zip softsysd@softsys.space:${{ env.WORKING_DIRECTORY }}/
+        run: scp deploy.zip softsysd@softsys.space:${{ secrets.WORK_DIR }}/
 
       - name: Deploy on server
-        run: ssh softsysd@softsys.space 'unzip -o ${{ env.WORKING_DIRECTORY }}/deploy.zip -d ${{ env.WORKING_DIRECTORY }} && rm ${{ env.WORKING_DIRECTORY }}/deploy.zip'
+        run: ssh softsysd@softsys.space 'unzip -o ${{ secrets.WORK_DIR }}/deploy.zip -d ${{ secrets.WORK_DIR }} && rm ${{ secrets.WORK_DIR }}/deploy.zip'
